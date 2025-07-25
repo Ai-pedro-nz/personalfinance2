@@ -1,0 +1,12 @@
+{
+  "name": "Personal Finance MVP",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Personal Finance App",
+      "visibility": "public"
+    }
+  },
+  "postCreateCommand": "npm install && npm run db:seed"
+}

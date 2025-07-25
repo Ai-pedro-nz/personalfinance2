@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  password       String
+  name           String
+  createdAt      DateTime         @default(now())
+  bankAccount    BankAccount?
+  learnedPatterns LearnedPattern[]
+}
+
+model BankAccount {
+  id          String        @id @default(cuid())
+  userId      String        @unique
+  name        String
+  accountType String
+  createdAt   DateTime      @default(now())
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  type         String        // 'income' or 'expense'
+  color        String
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String      @id @default(cuid())
+  bankAccountId String
+  date          DateTime
+  description   String
+  amount        Float
+  categoryId    String?
+  createdAt     DateTime    @default(now())
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  category      Category?   @relation(fields: [categoryId], references: [id])
+}
+
+model LearnedPattern {
+  id           String   @id @default(cuid())
+  userId       String
+  keywords     String   // JSON array of keywords
+  categoryName String
+  confidence   Float
+  occurrences  Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
