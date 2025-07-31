@@ -4,7 +4,7 @@ import { promisify } from 'util'
 
 const execAsync = promisify(exec)
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     console.log('🔄 Starting database migration...')
     
@@ -27,4 +27,8 @@ export async function POST(request: NextRequest) {
       details: error.stdout || error.stderr
     }, { status: 500 })
   }
+}
+
+export async function POST(request: NextRequest) {
+  return GET(request)
 }
