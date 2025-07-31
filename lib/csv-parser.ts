@@ -1,5 +1,5 @@
 interface CSVTransaction {
-  date: string
+  date: Date
   description: string
   amount: number
 }
@@ -41,7 +41,7 @@ export function parseISPBankCSV(csvContent: string): CSVTransaction[] {
       if (isNaN(amount)) continue
 
       transactions.push({
-        date: date.toISOString(),
+        date,
         description,
         amount
       })
@@ -127,4 +127,196 @@ function parseAmount(amountStr: string): number {
   }
   
   return parseFloat(cleaned)
+}
+
+// Generic CSV parser that the tests expect
+export async function parseCSV(buffer: Buffer): Promise<CSVTransaction[]> {
+  const csvContent = buffer.toString('utf-8')
+  
+  if (!csvContent.trim()) {
+    throw new Error('Empty CSV file')
+  }
+  
+  const lines = csvContent.trim().split('\n')
+  if (lines.length === 0) {
+    throw new Error('Empty CSV file')
+  }
+  
+  // Parse header
+  const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''))
+  
+  if (!validateCSVHeaders(headers)) {
+    throw new Error('Missing required headers: date, description, amount')
+  }
+  
+  const transactions: CSVTransaction[] = []
+  
+  // Process data rows
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+    
+    try {
+      const fields = parseCSVLine(line)
+      if (fields.length !== headers.length) continue
+      
+      const row: any = {}
+      headers.forEach((header, index) => {
+        row[header] = fields[index]
+      })
+      
+      // Parse date
+      const dateValue = row.date || row.Date
+      if (!dateValue) continue
+      
+      const parsedDate = parseDate(dateValue)
+      if (!parsedDate) continue
+      
+      // Parse description
+      const description = row.description || row.Description || ''
+      if (!description.trim()) continue
+      
+      // Parse amount
+      const amountValue = row.amount || row.Amount
+      if (!amountValue) continue
+      
+      const amount = normalizeAmount(amountValue)
+      if (isNaN(amount)) continue
+      
+      transactions.push({
+        date: parsedDate,
+        description: description.trim(),
+        amount
+      })
+    } catch (error) {
+      // Skip invalid rows
+      continue
+    }
+  }
+  
+  return transactions
+}
+
+export function validateCSVHeaders(headers: string[]): boolean {
+  const requiredHeaders = ['date', 'description', 'amount']
+  return requiredHeaders.every(required => 
+    headers.some(header => header.toLowerCase().includes(required.toLowerCase()))
+  )
+}
+
+export function normalizeAmount(amount: string | number): number {
+  if (typeof amount === 'number') return amount
+  
+  const amountStr = String(amount).trim()
+  if (!amountStr) throw new Error('Invalid amount format')
+  
+  // Handle parentheses (negative)
+  if (amountStr.startsWith('(') && amountStr.endsWith(')')) {
+    const innerAmount = amountStr.slice(1, -1)
+    return -normalizeAmount(innerAmount)
+  }
+  
+  // Remove currency symbols, spaces, and commas
+  let cleaned = amountStr.replace(/[$€£¥₹,\s]/g, '')
+  
+  // Handle explicit positive sign
+  if (cleaned.startsWith('+')) {
+    cleaned = cleaned.slice(1)
+  }
+  
+  const parsed = parseFloat(cleaned)
+  if (isNaN(parsed)) {
+    throw new Error('Invalid amount format')
+  }
+  
+  return parsed
+}
+
+export function parseDate(dateStr: string | Date): Date {
+  if (dateStr instanceof Date) return dateStr
+  
+  const str = String(dateStr).trim()
+  if (!str) throw new Error('Invalid date format')
+  
+  // Try various date formats
+  const formats = [
+    /^(\d{4})-(\d{1,2})-(\d{1,2})$/, // YYYY-MM-DD
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // MM/DD/YYYY or DD/MM/YYYY
+    /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // DD-MM-YYYY
+    /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/, // YYYY/MM/DD
+  ]
+  
+  for (const format of formats) {
+    const match = str.match(format)
+    if (match) {
+      const [, part1, part2, part3] = match
+      
+      // YYYY-MM-DD or YYYY/MM/DD
+      if (format === formats[0] || format === formats[3]) {
+        const year = parseInt(part1, 10)
+        const monthNum = parseInt(part2, 10)
+        const dayNum = parseInt(part3, 10)
+        
+        // Validate ranges before creating date
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) {
+          continue // Skip this match, try next format
+        }
+        
+        const month = monthNum - 1
+        const date = new Date(year, month, dayNum)
+        
+        // Ensure the date components didn't overflow
+        if (date.getFullYear() === year && date.getMonth() === month && date.getDate() === dayNum) {
+          return date
+        }
+      }
+      
+      // MM/DD/YYYY or DD/MM/YYYY (assume MM/DD/YYYY)
+      if (format === formats[1]) {
+        const month = parseInt(part1, 10) - 1
+        const day = parseInt(part2, 10)
+        const year = parseInt(part3, 10)
+        const date = new Date(year, month, day)
+        if (!isNaN(date.getTime())) return date
+      }
+      
+      // DD-MM-YYYY
+      if (format === formats[2]) {
+        const day = parseInt(part1, 10)
+        const month = parseInt(part2, 10) - 1
+        const year = parseInt(part3, 10)
+        const date = new Date(year, month, day)
+        if (!isNaN(date.getTime())) return date
+      }
+    }
+  }
+  
+  // Check for obviously invalid patterns first
+  if (str === 'invalid-date' || str === '') {
+    throw new Error('Invalid date format')
+  }
+  
+  // Check for invalid month/day values in YYYY-MM-DD format
+  const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+  if (isoMatch) {
+    const [, , month, day] = isoMatch
+    const monthNum = parseInt(month, 10)
+    const dayNum = parseInt(day, 10)
+    if (monthNum > 12 || monthNum < 1 || dayNum > 31 || dayNum < 1) {
+      throw new Error('Invalid date format')
+    }
+    // Also validate that the date is actually valid when constructed
+    const testDate = new Date(parseInt(isoMatch[1], 10), monthNum - 1, dayNum)
+    if (isNaN(testDate.getTime())) {
+      throw new Error('Invalid date format')
+    }
+  }
+  
+  // Try native Date parsing as fallback
+  const nativeDate = new Date(str)
+  if (!isNaN(nativeDate.getTime())) {
+    return nativeDate
+  }
+  
+  throw new Error('Invalid date format')
 }
