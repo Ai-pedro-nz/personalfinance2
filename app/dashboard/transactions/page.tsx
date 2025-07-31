@@ -263,36 +263,36 @@ export default function TransactionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">Loading transactions...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-lg dark:text-white">Loading transactions...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <nav className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <a href="/dashboard" className="text-xl font-semibold">Personal Finance</a>
+              <a href="/dashboard" className="text-xl font-semibold dark:text-white">Personal Finance</a>
             </div>
             <div className="flex items-center space-x-4">
               <a
                 href="/dashboard"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Dashboard
               </a>
               <a
                 href="/dashboard/upload"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Upload CSV
               </a>
               <a
                 href="/dashboard/settings"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Settings
               </a>
@@ -303,14 +303,14 @@ export default function TransactionsPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                     Transactions ({filteredAndSortedTransactions.length} of {transactions.length})
                   </h3>
-                  <div className="flex space-x-4 mt-2 text-sm text-gray-600">
+                  <div className="flex space-x-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
                     <span className="text-green-600 font-medium">
                       {categorizedCount} categorized
                     </span>
@@ -328,20 +328,20 @@ export default function TransactionsPage() {
                   <button
                     onClick={runRetraining}
                     disabled={retraining || (trainingStatus ? !trainingStatus.canRetrain : categorizedCount < 5)}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     title={categorizedCount < 5 ? `Need at least 5 categorized transactions (you have ${categorizedCount})` : 'Retrain AI with your categorizations'}
                   >
                     {retraining ? 'Retraining...' : '🧠 Retrain AI'}
                   </button>
                   <button
                     onClick={fetchPreview}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
                     Auto-Categorize
                   </button>
                   <a
                     href="/dashboard/upload"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
                     Upload More
                   </a>
@@ -350,14 +350,14 @@ export default function TransactionsPage() {
 
               <div className="mb-4 flex space-x-4">
                 <div>
-                  <label htmlFor="filter" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Filter
                   </label>
                   <select
                     id="filter"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as 'all' | 'categorized' | 'uncategorized')}
-                    className="block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    className="block w-48 pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                   >
                     <option value="all">All Transactions</option>
                     <option value="categorized">Categorized Only</option>
@@ -368,13 +368,13 @@ export default function TransactionsPage() {
 
               {filteredAndSortedTransactions.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="text-gray-500 mb-4">
+                  <div className="text-gray-500 dark:text-gray-400 mb-4">
                     {transactions.length === 0 ? 'No transactions found' : `No ${filterStatus} transactions found`}
                   </div>
                   {transactions.length === 0 && (
                     <a
                       href="/dashboard/upload"
-                      className="text-indigo-600 hover:text-indigo-500 font-medium"
+                      className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
                     >
                       Upload your first CSV file
                     </a>
@@ -382,67 +382,67 @@ export default function TransactionsPage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
                         <th 
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => handleSort('date')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Date</span>
-                            <span className="text-gray-400">{getSortIcon('date')}</span>
+                            <span className="text-gray-400 dark:text-gray-500">{getSortIcon('date')}</span>
                           </div>
                         </th>
                         <th 
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => handleSort('description')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Description</span>
-                            <span className="text-gray-400">{getSortIcon('description')}</span>
+                            <span className="text-gray-400 dark:text-gray-500">{getSortIcon('description')}</span>
                           </div>
                         </th>
                         <th 
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => handleSort('amount')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Amount</span>
-                            <span className="text-gray-400">{getSortIcon('amount')}</span>
+                            <span className="text-gray-400 dark:text-gray-500">{getSortIcon('amount')}</span>
                           </div>
                         </th>
                         <th 
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                           onClick={() => handleSort('category')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Category</span>
-                            <span className="text-gray-400">{getSortIcon('category')}</span>
+                            <span className="text-gray-400 dark:text-gray-500">{getSortIcon('category')}</span>
                           </div>
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                       {filteredAndSortedTransactions.map((transaction) => (
-                        <tr key={transaction.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <tr key={transaction.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {formatDate(transaction.date)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                          <td className="px-6 py-4 text-sm text-gray-900 dark:text-white max-w-xs truncate">
                             {transaction.description}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <span className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            <span className={transaction.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                               {formatCurrency(transaction.amount)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             <select
                               value={transaction.categoryId || ''}
                               onChange={(e) => updateTransactionCategory(transaction.id, e.target.value)}
                               disabled={updatingTransaction === transaction.id}
-                              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             >
                               <option value="">Uncategorized</option>
                               {categories.map((category) => (
@@ -471,14 +471,14 @@ export default function TransactionsPage() {
 
               {showPreview && previewData && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                  <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+                  <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-600">
                     <div className="mt-3">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                         Auto-Categorization Preview
                       </h3>
                       
-                      <div className="mb-4 p-4 bg-blue-50 rounded-md">
-                        <p className="text-sm text-blue-800">
+                      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900 rounded-md">
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
                           Found {previewData.totalUncategorized} uncategorized transactions.
                           {previewData.wouldBeCategorized} can be auto-categorized.
                         </p>
@@ -486,32 +486,32 @@ export default function TransactionsPage() {
 
                       <div className="max-h-96 overflow-y-auto mb-4">
                         <table className="min-w-full">
-                          <thead className="bg-gray-50">
+                          <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                                 Description
                               </th>
-                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                                 Amount
                               </th>
-                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                                 Suggested Category
                               </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-200">
+                          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                             {previewData.preview.map((item: any) => (
                               <tr key={item.id}>
-                                <td className="px-3 py-2 text-sm text-gray-900 max-w-xs truncate">
+                                <td className="px-3 py-2 text-sm text-gray-900 dark:text-white max-w-xs truncate">
                                   {item.description}
                                 </td>
                                 <td className="px-3 py-2 text-sm font-medium">
-                                  <span className={item.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                  <span className={item.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                                     {formatCurrency(item.amount)}
                                   </span>
                                 </td>
-                                <td className="px-3 py-2 text-sm text-gray-900">
-                                  <span className={item.suggestedCategory === 'No suggestion' ? 'text-gray-400' : 'text-green-600 font-medium'}>
+                                <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">
+                                  <span className={item.suggestedCategory === 'No suggestion' ? 'text-gray-400 dark:text-gray-500' : 'text-green-600 dark:text-green-400 font-medium'}>
                                     {item.suggestedCategory}
                                   </span>
                                 </td>
@@ -524,14 +524,14 @@ export default function TransactionsPage() {
                       <div className="flex justify-end space-x-3">
                         <button
                           onClick={() => setShowPreview(false)}
-                          className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium"
+                          className="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm font-medium"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={runAutoCategorization}
                           disabled={autoCategorizing || previewData.wouldBeCategorized === 0}
-                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {autoCategorizing ? 'Processing...' : `Categorize ${previewData.wouldBeCategorized} Transactions`}
                         </button>
