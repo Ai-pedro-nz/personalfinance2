@@ -18,6 +18,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
+          <div className="bg-orange-100 dark:bg-orange-900 border-b border-orange-300 dark:border-orange-700 px-4 py-2">
+            <div className="flex items-center justify-center">
+              <span className="text-orange-800 dark:text-orange-200 text-sm font-medium">
+                🚧 Development Branch - New Features in Progress
+              </span>
+            </div>
+          </div>
           {children}
         </ThemeProvider>
       </body>
