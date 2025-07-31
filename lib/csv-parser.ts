@@ -28,7 +28,7 @@ export function parseISPBankCSV(csvContent: string): CSVTransaction[] {
       const [dateStr, , , , payee, memo, amountStr] = fields
       
       // Parse date (format: YYYY/MM/DD)
-      const date = parseDate(dateStr)
+      const date = parseISPDate(dateStr)
       if (!date) continue
 
       // Combine Payee and Memo for description
@@ -73,7 +73,7 @@ function parseCSVLine(line: string): string[] {
   return fields.map(field => field.replace(/^"|"$/g, '').trim())
 }
 
-function parseDate(dateStr: string): Date | null {
+function parseISPDate(dateStr: string): Date | null {
   // Handle YYYY/MM/DD format
   const yyyymmddMatch = dateStr.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/)
   if (yyyymmddMatch) {
