@@ -48,7 +48,11 @@ export async function makeRequest<T = any>(
     data = await response.json()
   } catch {
     // Handle non-JSON responses
-    data = await response.text() as unknown as T
+    try {
+      data = await response.text() as unknown as T
+    } catch {
+      data = {} as T
+    }
   }
 
   return {
