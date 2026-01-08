@@ -173,6 +173,93 @@ The application uses a flexible environment configuration system to support both
 - Rotate database credentials immediately if they're ever exposed in git history
 - Use environment variables or secrets management for sensitive production values
 
+### Deployment (Vercel)
+
+#### Prerequisites
+1. A Vercel account connected to your GitHub repository
+2. A PostgreSQL database (e.g., Supabase, Railway, or Vercel Postgres)
+3. Database credentials ready
+
+#### Required Environment Variables in Vercel
+Configure these in your Vercel project settings (Settings → Environment Variables):
+
+| Variable | Value | Notes |
+|----------|-------|-------|
+| `DATABASE_URL` | Your PostgreSQL connection string | Format: `postgresql://user:password@host:port/database` |
+| `JWT_SECRET` | Strong random string (32+ chars) | Generate with: `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Your deployment URL | e.g., `https://your-app.vercel.app` |
+| `NODE_ENV` | `production` | Optional, Vercel sets this automatically |
+
+#### Deployment Steps
+
+1. **Update Prisma Schema for Production:**
+   - Before deploying, ensure `prisma/schema.prisma` uses PostgreSQL provider:
+   ```prisma
+   datasource db {
+     provider = "postgresql"  // Change from "sqlite" to "postgresql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+
+2. **Configure Environment Variables:**
+   - Go to your Vercel project → Settings → Environment Variables
+   - Add all required variables listed above
+   - Apply to Production, Preview, and Development environments as needed
+
+3. **Deploy:**
+   - Push to your connected GitHub branch
+   - Vercel will automatically build and deploy
+   - Monitor build logs for any errors
+
+4. **Run Database Migrations:**
+   - After first deployment, run migrations via Vercel CLI or the `/api/migrate` endpoint:
+   ```bash
+   # Option 1: Using Vercel CLI
+   vercel env pull .env.production.local
+   npx prisma db push
+
+   # Option 2: Via API endpoint (if enabled)
+   curl -X POST https://your-app.vercel.app/api/migrate
+   ```
+
+5. **Seed the Database:**
+   - Run the seed command with production environment:
+   ```bash
+   DATABASE_URL="your-production-url" npm run db:seed
+   ```
+
+#### Build Configuration
+The application is configured to handle Vercel builds gracefully:
+- Prisma client uses a fallback DATABASE_URL during build if not set
+- The actual database connection happens at runtime, not build time
+- `npm run build` includes Prisma client generation automatically
+
+#### Troubleshooting Vercel Deployment
+
+**Build fails with "Invalid value undefined for datasource":**
+- Ensure `DATABASE_URL` is set in Vercel environment variables
+- Check that the environment variable is available in the correct environment (Production/Preview/Development)
+
+**Database connection timeout:**
+- Verify your database allows connections from Vercel's IP ranges
+- Check if your database provider requires connection pooling (e.g., Supabase uses port 6543 for pooling)
+- Ensure the connection string includes appropriate pooling parameters
+
+**Prisma client version mismatch:**
+- The build process automatically generates Prisma client
+- If issues persist, try clearing Vercel's build cache: Settings → Clear Cache
+
+**Authentication issues:**
+- Verify `JWT_SECRET` is set correctly
+- Ensure `NEXTAUTH_URL` matches your deployment URL exactly
+- Check that cookies are working (requires HTTPS in production)
+
+#### Local Development vs Production
+- **Local:** Uses SQLite (`file:./dev.db`) for simplicity
+- **Production:** Uses PostgreSQL for scalability and concurrent connections
+- Keep `prisma/schema.prisma` synced with your deployment target
+- Consider maintaining separate schema files if needed (`schema.dev.prisma` for local)
+
 ## Testing
 
 The project uses Jest and React Testing Library for comprehensive testing. Test files are located in `__tests__/` directory.

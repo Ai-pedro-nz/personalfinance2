@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure for Codespaces
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
-  },
+  // Configure external packages for server-side rendering
+  serverExternalPackages: ['@prisma/client'],
   // Allow external hosts for Codespaces
   async headers() {
     return [
