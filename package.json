@@ -10,14 +10,15 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "db:seed": "tsx prisma/seed.ts",
+    "db:check": "tsx scripts/check-db.ts",
+    "db:status": "npx prisma db status",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
     "test:e2e": "jest __tests__/e2e --testTimeout=45000",
     "test:production": "BASE_URL=${BASE_URL:-https://personalfinance-mauve.vercel.app} jest __tests__/e2e --testTimeout=45000",
-    "db:check": "tsx scripts/check-db.ts",
-    "db:status": "npx prisma db status"
+    "test:supabase": "tsx scripts/test-supabase.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
