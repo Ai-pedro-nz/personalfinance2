@@ -109,9 +109,69 @@ When adding transactions, the system:
 3. Stores transaction with or without category
 4. Updates learned patterns for future categorization
 
-### Environment Variables
-- `JWT_SECRET`: JWT signing secret
-- `DATABASE_URL`: SQLite database path (defaults to `file:./dev.db`)
+### Environment Variables and Configuration Strategy
+
+The application uses a flexible environment configuration system to support both local development and production deployments.
+
+#### Environment Files
+- `.env.active`: The active environment configuration (gitignored for security)
+- `.env.active.example`: Template file with example configuration
+- `.env.local`: Local development with SQLite (gitignored)
+- `.env.production`: Production configuration with PostgreSQL/Supabase (gitignored)
+- `scripts/env-switch.js`: Automatic environment switching based on git branch
+
+#### Key Environment Variables
+- `DATABASE_URL`: Database connection string
+  - Local development: `file:./dev.db` (SQLite)
+  - Production: PostgreSQL connection string (Supabase or other)
+- `JWT_SECRET`: JWT signing secret (MUST be changed in production)
+- `NEXTAUTH_URL`: Application URL (e.g., `http://localhost:3000`)
+- `NODE_ENV`: Environment mode (`development`, `production`, or `test`)
+
+#### Database Strategy
+**Local Development:**
+- Uses SQLite (`file:./dev.db`) for simplicity and no external dependencies
+- Schema defined in `prisma/schema.prisma` with `provider = "sqlite"`
+- Alternative schema available in `prisma/schema.dev.prisma`
+- Run `npm run dev:local` to explicitly use SQLite
+
+**Production:**
+- Uses PostgreSQL (Supabase) for scalability and features
+- Requires changing `prisma/schema.prisma` provider to `postgresql`
+- Connection pooling configured in `lib/prisma.ts`
+
+#### Setting Up Your Environment
+
+1. **First Time Setup:**
+   ```bash
+   # Copy the example file
+   cp .env.active.example .env.active
+
+   # Edit .env.active with your configuration
+   # For local development, keep DATABASE_URL="file:./dev.db"
+
+   # Install dependencies (skip postinstall if Prisma download fails)
+   npm install --ignore-scripts
+
+   # Set up the database
+   npx prisma db push
+
+   # Seed with default categories
+   npm run db:seed
+   ```
+
+2. **Branch-Based Environment Switching:**
+   The `scripts/env-switch.js` script automatically switches environments based on your git branch:
+   - `main` branch → `.env.production`
+   - `mvp-v1-stable` branch → `.env`
+   - Feature branches → `.env.local` (default)
+
+#### Security Best Practices
+- **NEVER commit** `.env.active`, `.env.local`, or `.env.production` to git
+- Always use `.env.active.example` as a template for sharing configuration structure
+- Change default `JWT_SECRET` before deploying to production
+- Rotate database credentials immediately if they're ever exposed in git history
+- Use environment variables or secrets management for sensitive production values
 
 ## Testing
 
